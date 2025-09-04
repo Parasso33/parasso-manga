@@ -1,12 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Bookmark, Clock, Settings, User as UserIcon } from 'lucide-react';
+import { Bookmark, Clock, Settings, User as UserIcon, Plus } from 'lucide-react';
 import MangaCard from '@/components/MangaCard';
 import { mangaData } from '@/data/manga';
 import type { Manga } from '@/types/manga';
 
 const STORAGE_KEY = 'mp_user';
 const GLOBAL_FAV_KEY = 'mp_favorites';
+const PROFILE_IMAGE_KEY = 'mp_profile_image';
 
 const getFavKeyForUser = (): string => {
   try {
@@ -15,9 +16,7 @@ const getFavKeyForUser = (): string => {
       const u = JSON.parse(raw);
       if (u?.email) return `mp_favs_${u.email}`;
     }
-  } catch {
-    /* ignore */
-  }
+  } catch {}
   return GLOBAL_FAV_KEY;
 };
 
@@ -34,9 +33,7 @@ const writeFavIds = (ids: string[]) => {
   try {
     localStorage.setItem(getFavKeyForUser(), JSON.stringify(ids));
     window.dispatchEvent(new CustomEvent('mp:favs:changed'));
-  } catch {
-    /* ignore */
-  }
+  } catch {}
 };
 
 const Profile: React.FC = () => {
@@ -44,11 +41,16 @@ const Profile: React.FC = () => {
   const [user, setUser] = useState<{ email: string; name: string } | null>(null);
   const [favIds, setFavIds] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState<'fav' | 'history' | 'reader' | 'account'>('fav');
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [newName, setNewName] = useState('');
 
   const loadUser = useCallback(() => {
     try {
       const raw = sessionStorage.getItem(STORAGE_KEY);
-      setUser(raw ? JSON.parse(raw) : null);
+      const parsed = raw ? JSON.parse(raw) : null;
+      setUser(parsed);
+      if (parsed?.name) setNewName(parsed.name);
     } catch {
       setUser(null);
     }
@@ -56,6 +58,11 @@ const Profile: React.FC = () => {
 
   const loadFavs = useCallback(() => {
     setFavIds(readFavIds());
+  }, []);
+
+  useEffect(() => {
+    const savedImage = localStorage.getItem(PROFILE_IMAGE_KEY);
+    if (savedImage) setProfileImage(savedImage);
   }, []);
 
   useEffect(() => {
@@ -96,6 +103,27 @@ const Profile: React.FC = () => {
     setFavIds([]);
   };
 
+  const handleProfileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const result = ev.target?.result as string;
+        setProfileImage(result);
+        localStorage.setItem(PROFILE_IMAGE_KEY, result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSaveProfile = () => {
+    if (!user) return;
+    const updatedUser = { ...user, name: newName };
+    setUser(updatedUser);
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(updatedUser));
+    setIsEditing(false);
+  };
+
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center p-8">
@@ -109,7 +137,6 @@ const Profile: React.FC = () => {
     );
   }
 
-  // Tab content renderers
   const renderTabContent = () => {
     switch (activeTab) {
       case 'fav':
@@ -144,15 +171,45 @@ const Profile: React.FC = () => {
               <div className="text-sm text-muted-foreground">البريد الإلكتروني</div>
               <div className="font-medium break-all">{user.email}</div>
             </div>
+
             <div className="p-4 bg-white/80 dark:bg-gray-800/75 rounded">
               <div className="text-sm text-muted-foreground">الاسم</div>
-              <div className="font-medium">{user.name}</div>
+              {isEditing ? (
+                <div className="flex gap-2 mt-1">
+                  <input
+                    type="text"
+                    value={newName}
+                    onChange={(e) => setNewName(e.target.value)}
+                    className="flex-1 px-2 py-1 rounded text-black focus:outline-none"
+                  />
+                  <button
+                    onClick={handleSaveProfile}
+                    className="px-3 py-1 bg-[#fb5922] text-white rounded hover:bg-[#e04e1d]"
+                  >
+                    حفظ
+                  </button>
+                  <button
+                    onClick={() => { setIsEditing(false); setNewName(user.name); }}
+                    className="px-3 py-1 bg-[#2A313C] text-white rounded hover:bg-muted"
+                  >
+                    إلغاء
+                  </button>
+                </div>
+              ) : (
+                <div className="font-medium flex items-center justify-between mt-1">
+                  <span>{user.name}</span>
+                  <button
+                    onClick={() => setIsEditing(true)}
+                    className="px-2 py-1 bg-[#1D2630] text-[#fb5922] rounded hover:bg-muted"
+                  >
+                    تعديل
+                  </button>
+                </div>
+              )}
             </div>
+
             <div className="flex gap-3">
-              <button onClick={() => window.alert('Edit profile not implemented')} className="px-4 py-2 bg-gray-100 text-[#fb5922] rounded">
-                تعديل الحساب
-              </button>
-              <button onClick={handleLogout} className="px-4 py-2 bg-[#fb5922] text-white rounded">
+              <button onClick={handleLogout} className="px-4 py-2 bg-[#fb5922] text-white rounded hover:bg-muted">
                 تسجيل الخروج
               </button>
             </div>
@@ -166,12 +223,31 @@ const Profile: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Left sidebar (icons style) */}
         <aside className="lg:col-span-1 bg-white/80 dark:bg-gray-800/75 rounded-lg shadow p-6">
           <div className="flex flex-col items-center text-center gap-4">
-            <div className="w-24 h-24 rounded-full bg-primary/10 text-primary flex items-center justify-center font-semibold text-2xl">
-              {initials || 'U'}
+            <div className="relative w-24 h-24">
+              <div className="w-24 h-24 rounded-full bg-primary/10 text-primary flex items-center justify-center font-semibold text-2xl overflow-hidden">
+                {profileImage ? (
+                  <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
+                ) : (
+                  initials || 'U'
+                )}
+              </div>
+              <label
+                htmlFor="profile-upload"
+                className="absolute bottom-0 right-0 w-8 h-8 flex items-center justify-center bg-[#fb5922] text-white rounded-full shadow cursor-pointer hover:bg-[#e04e1d]"
+              >
+                <Plus size={18} />
+              </label>
+              <input
+                id="profile-upload"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleProfileUpload}
+              />
             </div>
+
             <div>
               <h2 className="text-xl font-semibold">{user.name}</h2>
               <p className="text-sm text-muted-foreground break-all">{user.email}</p>
@@ -212,15 +288,8 @@ const Profile: React.FC = () => {
               إعدادات الحساب
             </button>
           </nav>
-
-          <div className="mt-6 border-t pt-4 text-sm text-muted-foreground">
-            <p>Favorites: <span className="font-medium">{favIds.length}</span></p>
-            <p className="mt-2">Joined: <span className="font-medium">—</span></p>
-            <p className="mt-2">Plan: <span className="font-medium">Free</span></p>
-          </div>
         </aside>
 
-        {/* Main */}
         <main className="lg:col-span-3">
           <div className="flex items-center justify-between mb-6">
             <h1 className="text-2xl font-semibold">
@@ -235,20 +304,14 @@ const Profile: React.FC = () => {
 
             <div className="flex items-center gap-2">
               {activeTab === 'fav' && (
-                <>
-                  <button
-                    onClick={clearFavorites}
-                    className="px-3 py-2 text-sm bg-[#fb5922] text-white rounded"
-                    disabled={favIds.length === 0}
-                    title="Clear all favorites"
-                  >
-                    مسح الكل
-                  </button>
-                </>
+                <button
+                  onClick={clearFavorites}
+                  className="px-3 py-2 text-sm bg-[#fb5922] text-white rounded"
+                  disabled={favIds.length === 0}
+                >
+                  مسح الكل
+                </button>
               )}
-              {/* <button onClick={() => navigate('/')} className="px-2 py-1.5 rounded bg-[#fb5922] text-white">
-  الرئيسية
-</button> */}
             </div>
           </div>
 
@@ -256,7 +319,7 @@ const Profile: React.FC = () => {
             <h2 className="text-lg font-semibold mb-4">نظرة عامة</h2>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="p-4 bg-white/70 dark:bg-gray-700/60 rounded shadow">
-                <div className="text-sm text-muted-foreground">لمفضلة</div>
+                <div className="text-sm text-muted-foreground">المفضلة</div>
                 <div className="text-2xl font-bold">{favIds.length}</div>
               </div>
               <div className="p-4 bg-white/70 dark:bg-gray-700/60 rounded shadow">
@@ -271,7 +334,7 @@ const Profile: React.FC = () => {
           </section>
 
           <section>
-            <div className="mb-4">{/* title already above */}</div>
+            <div className="mb-4"></div>
             <div className="text-muted-foreground">{renderTabContent()}</div>
           </section>
         </main>

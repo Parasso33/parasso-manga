@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useApp } from '@/contexts/AppContext';
 import { mangaData } from '@/data/manga';
 import type { Manga } from '@/types/manga';
+import { FaGoogle, FaFacebookF } from "react-icons/fa";
 
 type User = { email: string; name: string };
 
@@ -207,6 +208,12 @@ const Login: React.FC = () => {
     );
   }
 
+  const handleLogin = (provider: "google" | "facebook") => {
+    toast({
+      title: `${provider === "google" ? "Google" : "Facebook"} Login`,
+      description: "قريباً!",
+    });
+  };
   // Default: login form
   return (
     <div className="min-h-screen flex items-center justify-center py-12">
@@ -254,6 +261,26 @@ const Login: React.FC = () => {
                 translation.loginBtn
               )}
             </Button>
+
+            <div className="flex flex-col gap-4 mt-6">
+              <Button
+                variant="outline"
+                className="w-full flex items-center gap-2 border"
+                onClick={() => handleLogin("google")}
+              >
+                المتابعة عبر Google
+                <FaGoogle className="text-red-500" />
+              </Button>
+
+              <Button
+                variant="outline"
+                className="w-full flex items-center gap-2 border"
+                onClick={() => handleLogin("facebook")}
+              >
+                المتابعة عبر Facebook
+                <FaFacebookF className="text-blue-600" />
+              </Button>
+            </div>
           </form>
 
           <div className="mt-6 text-center text-muted-foreground text-sm">

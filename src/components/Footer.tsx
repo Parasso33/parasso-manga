@@ -30,25 +30,53 @@ const Footer: React.FC = () => {
           <div className="flex flex-col items-center">
             <h3 className="text-xl font-bold text-foreground mb-4">تابعنا</h3>
             <div className="flex gap-6 justify-center">
-             {/* Facebook */}
-      <div className="flex items-center justify-center w-12 h-12 bg-[#1877f2] rounded-full">
-        <FaFacebook size={28} color="white" />
-      </div>
+              {/* Facebook */}
+              <a
+                href="https://www.facebook.com"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Facebook"
+                className="group flex items-center justify-center w-12 h-12 rounded-full bg-[#1877f2] transform transition duration-200 shadow-sm hover:scale-110 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#1877f2]/40"
+                title="Facebook"
+              >
+                <FaFacebook size={20} className="text-white transition-colors group-hover:text-white" />
+              </a>
 
-               {/* X (Twitter) */}
-      <div className="flex items-center justify-center w-12 h-12 bg-black rounded-full">
-        <FaXTwitter size={28} color="white" />
-      </div>
+              {/* X (Twitter) */}
+              <a
+                href="https://twitter.com"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="X"
+                className="group flex items-center justify-center w-12 h-12 rounded-full bg-black transform transition duration-200 shadow-sm hover:scale-110 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black/40"
+                title="X"
+              >
+                <FaXTwitter size={20} className="text-white" />
+              </a>
 
               {/* Instagram */}
-      <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-tr from-pink-500 via-red-500 to-yellow-500 rounded-full">
-        <FaInstagram size={28} color="white" />
-      </div>
+              <a
+                href="https://www.instagram.com"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Instagram"
+                className="group flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-tr from-pink-500 via-red-500 to-yellow-500 transform transition duration-200 shadow-sm hover:scale-110 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-400/30"
+                title="Instagram"
+              >
+                <FaInstagram size={20} className="text-white" />
+              </a>
 
-              {/* Discord Icon */}
-              <div className="flex items-center justify-center w-12 h-12 bg-[#5865f2] rounded-full">
-      <FaDiscord size={28} color="white" />
-    </div>
+              {/* Discord */}
+              <a
+                href="https://discord.com"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Discord"
+                className="group flex items-center justify-center w-12 h-12 rounded-full bg-[#5865f2] transform transition duration-200 shadow-sm hover:scale-110 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5865f2]/30"
+                title="Discord"
+              >
+                <FaDiscord size={20} className="text-white" />
+              </a>
             </div>
           </div>
         </div>

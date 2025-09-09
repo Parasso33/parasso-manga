@@ -7,8 +7,6 @@ interface MangaCardProps {
   showLatestChapter?: boolean;
 }
 
-// NOTE: favorites are stored per-user when user is in session.
-// fallback to global key when no user in session.
 const SESSION_USER_KEY = 'mp_user';
 const GLOBAL_FAV_KEY = 'mp_favorites';
 
@@ -29,10 +27,8 @@ const readFavs = (): string[] => {
   try {
     const key = getFavKey();
     const raw = localStorage.getItem(key);
-    console.debug('[mp] readFavs key=', key, 'value=', raw);
     return raw ? JSON.parse(raw) : [];
-  } catch (err) {
-    console.error('[mp] readFavs error', err);
+  } catch {
     return [];
   }
 };
@@ -41,19 +37,20 @@ const writeFavs = (ids: string[]) => {
   try {
     const key = getFavKey();
     localStorage.setItem(key, JSON.stringify(ids));
-    console.debug('[mp] writeFavs key=', key, 'value=', ids);
-    // notify other parts (profile) that favs changed
     window.dispatchEvent(new CustomEvent('mp:favs:changed'));
-  } catch (err) {
-    console.error('[mp] writeFavs error', err);
-  }
+  } catch {}
 };
 
 const MangaCard: React.FC<MangaCardProps> = ({ manga, showLatestChapter = false }) => {
   const latestChapter = manga.chapters?.[0] ?? null;
   const [isFav, setIsFav] = useState<boolean>(false);
+  const [userLoggedIn, setUserLoggedIn] = useState<boolean>(false); // ✅ جديد
 
   useEffect(() => {
+    // نتحقق واش كاين user فـ sessionStorage
+    const raw = sessionStorage.getItem(SESSION_USER_KEY);
+    setUserLoggedIn(!!raw);
+
     const favs = readFavs();
     setIsFav(favs.includes(manga.id));
   }, [manga.id]);
@@ -62,41 +59,37 @@ const MangaCard: React.FC<MangaCardProps> = ({ manga, showLatestChapter = false 
     e.preventDefault();
     e.stopPropagation();
 
-    console.debug('[mp] toggleFav manga.id=', manga.id);
     const favs = readFavs();
-    console.debug('[mp] before favs=', favs);
     const exists = favs.includes(manga.id);
     const next = exists ? favs.filter((id) => id !== manga.id) : [...favs, manga.id];
 
     writeFavs(next);
     setIsFav(!exists);
-
-    // quick verification read back
-    const after = readFavs();
-    console.debug('[mp] after favs=', after);
   };
 
   return (
     <Link to={`/manga/${manga.id}`} className="block">
       <div className="manga-card group">
         <div className="relative overflow-hidden">
-          {/* Heart button (non-intrusive, top-right) */}
-          <button
-            onClick={toggleFav}
-            aria-pressed={isFav}
-            aria-label={isFav ? 'إزالة من المفضلة' : 'إضافة إلى المفضلة'}
-            className="absolute right-3 top-3 z-20 w-9 h-9 flex items-center justify-center rounded-full bg-black/30 text-white hover:bg-black/50 focus:outline-none"
-          >
-            {isFav ? (
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-red-400" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                <path d="M12 21s-7.5-4.873-10-8.093C-1.333 8.333 4.2 4.5 7.5 7.125 9.042 8.47 12 11 12 11s2.958-2.53 4.5-3.875C19.8 4.5 25.333 8.333 22 12.907 19.5 16.127 12 21 12 21z" />
-              </svg>
-            ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} aria-hidden>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3.172 7.172a4 4 0 015.656 0L12 10.343l3.172-3.171a4 4 0 015.656 5.656L12 21 3.172 12.828a4 4 0 010-5.656z" />
-              </svg>
-            )}
-          </button>
+          {/* ❤️ زر المفضلة مايبانش إلا إذا كان user مسجل */}
+          {userLoggedIn && (
+            <button
+              onClick={toggleFav}
+              aria-pressed={isFav}
+              aria-label={isFav ? 'إزالة من المفضلة' : 'إضافة إلى المفضلة'}
+              className="absolute right-3 top-3 z-20 w-9 h-9 flex items-center justify-center rounded-full bg-black/30 text-white hover:bg-black/50 focus:outline-none"
+            >
+              {isFav ? (
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-red-400" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                  <path d="M12 21s-7.5-4.873-10-8.093C-1.333 8.333 4.2 4.5 7.5 7.125 9.042 8.47 12 11 12 11s2.958-2.53 4.5-3.875C19.8 4.5 25.333 8.333 22 12.907 19.5 16.127 12 21 12 21z" />
+                </svg>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} aria-hidden>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.172 7.172a4 4 0 015.656 0L12 10.343l3.172-3.171a4 4 0 015.656 5.656L12 21 3.172 12.828a4 4 0 010-5.656z" />
+                </svg>
+              )}
+            </button>
+          )}
 
           <img
             src={manga.cover}

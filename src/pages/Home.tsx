@@ -60,6 +60,7 @@ const Home: React.FC = () => {
         </div>
       </div>
 
+    <div className="flex-1 flex flex-col justify-center">
       <div className="container mx-auto px-4 py-8">
         {/* Latest section */}
         <section className="mb-12">
@@ -68,7 +69,7 @@ const Home: React.FC = () => {
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
             {latestMangas.map((m) => (
-              <MangaCard key={m.id} manga={m} showLatestChapter />
+              <MangaCard key={m.id} manga={m}/>
             ))}
           </div>
         </section>
@@ -85,6 +86,7 @@ const Home: React.FC = () => {
           </div>
         </section>
       </div>
+    </div>
     </div>
   );
 };

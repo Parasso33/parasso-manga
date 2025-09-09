@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaDiscord, FaFacebook, FaInstagram } from "react-icons/fa";
+import { FaDiscord, FaFacebook, FaInstagram , FaTelegram} from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 
 const Footer: React.FC = () => {
@@ -14,7 +14,7 @@ const Footer: React.FC = () => {
           </div>
 
           {/* Center: Social Icons */}
-          <div className="flex gap-6 justify-center order-1 md:order-2">
+          <div className="flex gap-7 justify-center order-1 md:order-2">
             {/* Facebook */}
             <a
               href="https://www.facebook.com"
@@ -57,6 +57,16 @@ const Footer: React.FC = () => {
               className="flex items-center justify-center w-10 h-10 rounded-full bg-[#5865f2] transition transform hover:scale-110 hover:shadow-lg"
             >
               <FaDiscord size={18} className="text-white" />
+            </a>
+            {/* Telegram */}
+            <a
+              href="https://telegram.org"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Telegram"
+              className="flex items-center justify-center w-10 h-10 rounded-full bg-[#0088cc] transition transform hover:scale-110 hover:shadow-lg"
+            >
+              <FaTelegram size={18} className="text-white" />
             </a>
           </div>
 

@@ -129,6 +129,26 @@ All colors MUST be HSL.
   }
 }
 
+/* Set site-wide font to Comic Relief (with Almarai as fallback) */
+:root {
+  --site-font: "Comic Relief", "Almarai", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  font-family: var(--site-font);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Optionally make headings use the same font (or a different one if you prefer) */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--site-font);
+}
+
 @layer components {
   .manga-card {
     @apply bg-card rounded-lg overflow-hidden shadow-[var(--card-shadow)] 

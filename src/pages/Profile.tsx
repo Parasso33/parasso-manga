@@ -184,7 +184,7 @@ const Profile: React.FC = () => {
                   />
                   <button
                     onClick={handleSaveProfile}
-                    className="px-3 py-1 bg-[#fb5922] text-white rounded hover:bg-[#e04e1d]"
+                    className="px-3 py-1 bg-[#fb5922] text-white rounded hover:bg-muted"
                   >
                     حفظ
                   </button>
@@ -249,7 +249,7 @@ const Profile: React.FC = () => {
             </div>
 
             <div>
-              <h2 className="text-xl font-semibold">{user.name}</h2>
+              <h2 className="text-xl font-semibold text-[#ff6633]">{user.name}</h2>
               <p className="text-sm text-muted-foreground break-all">{user.email}</p>
             </div>
           </div>
@@ -292,7 +292,7 @@ const Profile: React.FC = () => {
 
         <main className="lg:col-span-3">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-semibold">
+            <h1 className="text-2xl font-semibold text-[#ff6633]">
               {activeTab === 'fav'
                 ? 'المفضلة'
                 : activeTab === 'history'
@@ -316,8 +316,8 @@ const Profile: React.FC = () => {
           </div>
 
           <section className="mb-8">
-            <h2 className="text-lg font-semibold mb-4">نظرة عامة</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <h2 className="text-lg font-semibold mb-4 text-[#ff6633]">نظرة عامة</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               <div className="p-4 bg-white/70 dark:bg-gray-700/60 rounded shadow">
                 <div className="text-sm text-muted-foreground">المفضلة</div>
                 <div className="text-2xl font-bold">{favIds.length}</div>

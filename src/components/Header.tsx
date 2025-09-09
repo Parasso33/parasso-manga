@@ -4,7 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useApp } from '@/contexts/AppContext';
 import { useProfile } from '@/contexts/ProfileContext';
-import { Menu } from 'lucide-react';
+import { Menu, Search } from 'lucide-react';
 
 const Header: React.FC = () => {
   const { translation, language, toggleLanguage, toggleTheme, theme, isLoggedIn } = useApp();
@@ -16,12 +16,14 @@ const Header: React.FC = () => {
   const isActive = (path: string) => location.pathname === path;
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setMobileMenuOpen(false);
+        setShowSearch(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -30,15 +32,17 @@ const Header: React.FC = () => {
 
   return (
     <header className="bg-card shadow-lg sticky top-0 z-50 manga-transition border-b">
-      <div className="container mx-auto px-4 md:px-6"> {/* زيادة px للجوانب */}
-        <div className="flex justify-between items-center py-4 w-full flex-wrap gap-4">
+      <div className="container mx-auto px-4 md:px-6">
+        <div className="flex justify-between items-center w-full flex-wrap gap-4">
           {/* Left: Logo */}
-          <div className="flex-1 flex justify-start px-2"> {/* padding داخلي صغير من الجوانب */}
-            <Link
-              to="/"
-              className="text-2xl font-bold text-primary hover:text-primary/80 manga-transition"
-            >
-              {translation.siteName}
+           <div className="flex-1 flex justify-start px-2">
+            <Link to="/" className="flex items-center gap-3">
+              <img
+                src="/images/icon.jpg"
+                alt={translation.siteName}
+                className="w-24 h-24 object-contain"
+                loading="lazy"
+              />
             </Link>
           </div>
 
@@ -58,8 +62,29 @@ const Header: React.FC = () => {
             </Link>
           </nav>
 
-          {/* Right: Profile + Theme + Language + Hamburger */}
+          {/* Right: Search + Profile + Theme + Language + Hamburger */}
           <div className="flex-1 flex justify-end items-center gap-2 relative px-2" ref={menuRef}>
+            
+            {/* Search Button */}
+            <div className="relative">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowSearch(!showSearch)}
+                className="rounded-full"
+              >
+                <Search size={18} />
+              </Button>
+              {showSearch && (
+                <input
+                  type="text"
+                  placeholder={translation.searchBtn || "Search..."}
+                  className="absolute top-full right-0 mt-2 w-48 p-2 rounded border border-gray-300 dark:border-gray-700 bg-background text-foreground shadow-md focus:outline-none"
+                  autoFocus
+                />
+              )}
+            </div>
+
             {/* Theme */}
             <Button
               variant="outline"
@@ -117,33 +142,17 @@ const Header: React.FC = () => {
             
             {/* Mobile Dropdown */}
             {mobileMenuOpen && (
-              <div className="absolute top-full left-0 mt-2 w-48 bg-card rounded shadow-lg flex flex-col gap-2 p-3 z-50">
-                <Link
-                  to="/"
-                  className={isActive('/') ? 'text-primary font-medium' : 'text-foreground/80 hover:text-primary'}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
+              <div className="absolute top-full right-0 mt-2 w-48 bg-card rounded shadow-lg flex flex-col gap-2 p-3 z-50">
+                <Link to="/" className={isActive('/') ? 'text-primary font-medium' : 'text-foreground/80 hover:text-primary'} onClick={() => setMobileMenuOpen(false)}>
                   {translation.home}
                 </Link>
-                <Link
-                  to="/browse"
-                  className={isActive('/browse') ? 'text-primary font-medium' : 'text-foreground/80 hover:text-primary'}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
+                <Link to="/browse" className={isActive('/browse') ? 'text-primary font-medium' : 'text-foreground/80 hover:text-primary'} onClick={() => setMobileMenuOpen(false)}>
                   {translation.browse}
                 </Link>
-                <Link
-                  to="/popular"
-                  className={isActive('/popular') ? 'text-primary font-medium' : 'text-foreground/80 hover:text-primary'}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
+                <Link to="/popular" className={isActive('/popular') ? 'text-primary font-medium' : 'text-foreground/80 hover:text-primary'} onClick={() => setMobileMenuOpen(false)}>
                   {translation.popular}
                 </Link>
-                <Link
-                  to="/latest"
-                  className={isActive('/latest') ? 'text-primary font-medium' : 'text-foreground/80 hover:text-primary'}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
+                <Link to="/latest" className={isActive('/latest') ? 'text-primary font-medium' : 'text-foreground/80 hover:text-primary'} onClick={() => setMobileMenuOpen(false)}>
                   {translation.latest}
                 </Link>
               </div>

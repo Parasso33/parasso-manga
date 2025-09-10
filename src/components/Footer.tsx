@@ -9,12 +9,12 @@ const Footer: React.FC = () => {
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           
           {/* Right: Copyright */}
-          <div className="text-muted-foreground text-sm order-2 md:order-1 md:text-left">
+          <div className="text-muted-foreground text-sm order-2 md:order-1 md:text-left ">
             جميع الحقوق محفوظة لموقع <span className="text-primary font-semibold">MangaParasso</span>
           </div>
 
           {/* Center: Social Icons */}
-          <div className="flex gap-7 justify-center order-1 md:order-2">
+          <div className="flex gap-7 justify-center order-1 md:order-2 ">
             {/* Facebook */}
             <a
               href="https://www.facebook.com"
@@ -71,7 +71,7 @@ const Footer: React.FC = () => {
           </div>
 
           {/* Left: Links */}
-          <div className="flex flex-wrap gap-2 text-muted-foreground text-sm order-3 md:order-3 md:text-right">
+          <div className="flex flex-wrap gap-2 text-muted-foreground text-sm order-3 md:order-3 md:text-right ">
             <a href="/" className="hover:text-primary transition-colors">MangaParasso</a>
             <span>|</span>
             <a href="/contact" className="hover:text-primary transition-colors">Contact Us</a>

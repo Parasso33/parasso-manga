@@ -4,7 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppProvider } from "@/contexts/AppContext";
-import { ProfileProvider } from "@/contexts/ProfileContext"; // 🔹 import ProfileProvider
+import { ProfileProvider } from "@/contexts/ProfileContext"; //  import ProfileProvider
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Home from "@/pages/Home";
@@ -23,7 +23,7 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <AppProvider>
-        <ProfileProvider> {/* 🔹 لف App بالـ ProfileProvider */}
+        <ProfileProvider> 
           <Toaster />
           <Sonner />
           <BrowserRouter>

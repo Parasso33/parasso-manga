@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Manga } from '@/types/manga';
+import { useToast } from '@/hooks/use-toast';
+import { useApp } from '@/contexts/AppContext';
+import type { Manga } from '@/types/manga';
 
 interface MangaCardProps {
   manga: Manga;
@@ -44,13 +46,11 @@ const writeFavs = (ids: string[]) => {
 const MangaCard: React.FC<MangaCardProps> = ({ manga, showLatestChapter = false }) => {
   const latestChapter = manga.chapters?.[0] ?? null;
   const [isFav, setIsFav] = useState<boolean>(false);
-  const [userLoggedIn, setUserLoggedIn] = useState<boolean>(false); // ✅ جديد
+  const { toast } = useToast();
+  const { isLoggedIn } = useApp();
+  const userLoggedIn = Boolean(isLoggedIn || sessionStorage.getItem(SESSION_USER_KEY));
 
   useEffect(() => {
-    // نتحقق واش كاين user فـ sessionStorage
-    const raw = sessionStorage.getItem(SESSION_USER_KEY);
-    setUserLoggedIn(!!raw);
-
     const favs = readFavs();
     setIsFav(favs.includes(manga.id));
   }, [manga.id]);
@@ -59,19 +59,26 @@ const MangaCard: React.FC<MangaCardProps> = ({ manga, showLatestChapter = false 
     e.preventDefault();
     e.stopPropagation();
 
+    if (!manga.id) return;
+
     const favs = readFavs();
     const exists = favs.includes(manga.id);
     const next = exists ? favs.filter((id) => id !== manga.id) : [...favs, manga.id];
-
     writeFavs(next);
     setIsFav(!exists);
+
+    if (!exists) {
+      toast?.({ title: 'تمت الإضافة إلى المفضلة !' });
+    } else {
+      toast?.({ title: 'تمت الإزالة من المفضلة' });
+    }
   };
 
   return (
     <Link to={`/manga/${manga.id}`} className="block">
       <div className="manga-card group">
         <div className="relative overflow-hidden">
-          {/* ❤️ زر المفضلة مايبانش إلا إذا كان user مسجل */}
+          {/* favorite button shown only when user logged in */}
           {userLoggedIn && (
             <button
               onClick={toggleFav}
@@ -96,18 +103,15 @@ const MangaCard: React.FC<MangaCardProps> = ({ manga, showLatestChapter = false 
             alt={manga.title}
             className="w-full h-64 object-cover manga-transition group-hover:scale-105"
           />
-          
-          <div className="overlay-gradient absolute inset-0 opacity-0 group-hover:opacity-100 
-                          manga-transition flex items-end p-4">
+
+          <div className="overlay-gradient absolute inset-0 opacity-0 group-hover:opacity-100 manga-transition flex items-end p-4">
             <div className="text-white">
               <h3 className="font-bold text-lg mb-1">{manga.title}</h3>
               <p className="text-sm opacity-90">
                 {manga.status} • {manga.type}
               </p>
               {showLatestChapter && latestChapter && (
-                <p className="text-xs opacity-80 mt-1">
-                  الفصل {latestChapter.number}
-                </p>
+                <p className="text-xs opacity-80 mt-1">الفصل {latestChapter.number}</p>
               )}
             </div>
           </div>
@@ -117,11 +121,11 @@ const MangaCard: React.FC<MangaCardProps> = ({ manga, showLatestChapter = false 
           <h3 className="font-bold text-lg mb-2 text-card-foreground group-hover:text-primary manga-transition">
             {manga.title}
           </h3>
-          
+
           <div className="flex items-center justify-between text-sm text-muted-foreground">
             <span>{manga.author}</span>
             <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-              manga.status === 'مستمر' 
+              manga.status === 'مستمر'
                 ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
                 : manga.status === 'مكتمل'
                 ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'

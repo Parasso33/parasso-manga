@@ -65,21 +65,26 @@ const Header: React.FC = () => {
 
       {/* Right: Search + Profile + Theme + Language + Hamburger */}
       <div className="flex-1 flex justify-end items-center gap-2 relative px-2" ref={menuRef}>
-        {/* Search Button */}
-        <div className="relative">
-          <Button variant="outline" size="sm" onClick={() => setShowSearch(!showSearch)} className="rounded-full">
-            <Search size={18} />
-          </Button>
-          {showSearch && (
-            <input
-              type="text"
-              placeholder={translation.searchBtn || "Search..."}
-              className="absolute top-full right-0 mt-2 w-48 p-2 rounded border border-gray-300 dark:border-gray-700 bg-background text-foreground shadow-md focus:outline-none"
-              autoFocus
-            />
-          )}
-        </div>
 
+            {/* Search Button */}
+            <div className="relative">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowSearch(!showSearch)}
+                className="rounded-full"
+              >
+                <Search size={18} />
+              </Button>
+              {showSearch && (
+                <input
+                  type="text"
+                  placeholder={translation.searchBtn || "Search..."}
+                  className="absolute top-full left-1/2 -translate-x-1/2 translate-x-[-108px] mt-7 w-48 p-2 rounded border border-gray-300 dark:border-gray-700 bg-background text-foreground shadow-md focus:outline-none z-50"
+                  autoFocus
+                />
+              )}
+            </div>
         {/* Theme */}
         <Button variant="outline" size="sm" onClick={toggleTheme} className="rounded-full">
           <i className={`fas ${theme === 'dark' ? 'fa-sun' : 'fa-moon'}`} />

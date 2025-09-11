@@ -9,6 +9,7 @@ const STORAGE_KEY = 'mp_user';
 const GLOBAL_FAV_KEY = 'mp_favorites';
 const PROFILE_IMAGE_KEY = 'mp_profile_image';
 
+
 const getFavKeyForUser = (): string => {
   try {
     const raw = sessionStorage.getItem(STORAGE_KEY);
